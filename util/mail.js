@@ -4,7 +4,7 @@ const pass = process.env.MAIL_PASS;
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: mail_id, pass: pass } });
 
-const target_url = "http://localhost:5500/public/auth/new_password.html"
+const target_url = "http://lva1d6.deta.dev/public/auth/new_password.html"
 module.exports = (destination, code) => {
     let mailOptions = {
         from: mail_id,
