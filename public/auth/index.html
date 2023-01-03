@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MESA Authentication</title>
+        <style>
+            body{
+                padding: 50px 20px;
+                margin: 0;
+            }
+            .wrapper{
+                width: clamp(240px, 100%, 540px);
+                margin: 0 auto;
+            }
+            h1{
+                text-align: center;
+            }
+            form{
+                margin: 50px auto;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: wrap;
+            }
+            form input {
+                margin-bottom: 20px;
+                padding: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrapper">
+            <h1>MESA Authentication</h1>
+            <form id="auth">
+                <label for="email">email_id</label>
+                <input type="text" name="email" id="email" required
+                autocomplete="on" placeholder="yourname@domain.extension">
+
+                <label for="password">password</label>
+                <input type="text" name="password" id="password" required
+                autocomplete="on" placeholder="not_12345">
+
+                <input type="submit" value="submit">
+
+                <a href="./password_reset.html">forgot your password ? reset now</a>
+            </form>               
+            <div id="result"></div>
+        </div>
+
+        <script>
+            const base_url = 'http://localhost:3000';
+            const auth_form = document.getElementById('auth');
+            const result_div = document.getElementById('result')
+
+            let email = '', 
+                password = '';
+        
+            if (localStorage.email && 
+                (localStorage.email !== undefined)) email = localStorage.email;
+            auth_form.email.value = email;
+        
+            if (localStorage.password && 
+                (localStorage.password !== undefined)) password = localStorage.password; 
+            auth_form.password.value = password;
+        
+        
+            auth_form.onsubmit = (e) => {
+                e.preventDefault()
+                let email = auth_form.email.value;
+                let password = auth_form.password.value;
+                fetch(base_url + '/auth', {
+                    method: 'POST', 
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                }).then(response => {
+                    console.log(response)
+                    response.json()
+                        .then(r => {
+                            console.log(r)
+                            let p = document.createElement('p')
+                            p.innerText = r.msg
+                            if (r.code === 200){
+                                localStorage.email = email
+                                localStorage.password = password
+                            } else {
+                                p.style.color = 'red'
+                            }
+                            result_div.appendChild(p)
+                            p.scrollIntoView()
+                        }).catch(e => {
+                            console.error(e)
+
+                            let p = document.createElement('p')
+                            p.innerText = e.stringify()
+                            p.style.color = 'red'
+                            result_div.appendChild(p)
+                            p.scrollIntoView()
+                        });
+                }).catch(e => {
+                    console.error(e)
+
+                    let p = document.createElement('p')
+                    p.innerText = e.stringify()
+                    p.style.color = 'red'
+                    result_div.appendChild(p)
+                    p.scrollIntoView()
+                });
+            
+            };
+        </script>
+
+    </body>
+</html>
